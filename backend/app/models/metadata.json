@@ -1,0 +1,25 @@
+{
+    "model_name": "PayGuard AI Random Forest",
+    "model_version": "1.0",
+    "features": [
+        "step",
+        "amount",
+        "oldbalanceOrg",
+        "oldbalanceDest",
+        "amount_to_orig_balance",
+        "log_amount",
+        "hour_sin",
+        "hour_cos",
+        "type_CASH_IN",
+        "type_CASH_OUT",
+        "type_DEBIT",
+        "type_PAYMENT",
+        "type_TRANSFER"
+    ],
+    "decision_threshold": 0.8412025072388617,
+    "risk_bands": {
+        "approve_below": 30,
+        "review_below": 70,
+        "block_from": 70
+    }
+}

@@ -1,0 +1,541 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PayGuard AI | Fraud Intelligence</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <!-- SIDEBAR -->
+
+        <aside class="sidebar">
+
+            <div class="brand">
+                <div class="brand-icon">P</div>
+
+                <div>
+                    <h2>PayGuard AI</h2>
+                    <span>FRAUD INTELLIGENCE</span>
+                </div>
+            </div>
+
+            <p class="sidebar-label">WORKSPACE</p>
+
+            <nav class="navigation">
+
+                <button class="nav-item active" data-page="overview">
+                    ▦ <span>Overview</span>
+                </button>
+
+                <button class="nav-item" data-page="analyze">
+                    ◉ <span>Analyze Transaction</span>
+                </button>
+
+                <button class="nav-item" data-page="history">
+                    ▤ <span>Transaction History</span>
+                </button>
+
+            </nav>
+
+            <div class="system-status">
+                <span class="status-dot"></span>
+
+                <div>
+                    <strong>System Online</strong>
+                    <small>API connection</small>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                PAYGUARD AI · VERSION 1.0
+            </div>
+
+        </aside>
+
+
+        <!-- MAIN CONTENT -->
+
+        <main class="main-content">
+
+            <header class="topbar">
+
+                <div>
+                    <p class="eyebrow">PAYMENT SECURITY PLATFORM</p>
+                    <h1>Fraud Intelligence Dashboard</h1>
+                    <p class="subtitle">
+                        Monitor transactions and detect suspicious activity.
+                    </p>
+                </div>
+
+                <div class="profile">
+                    <span class="live-indicator"></span>
+                    LIVE
+                    <div class="profile-icon">PG</div>
+                </div>
+
+            </header>
+
+
+            <!-- OVERVIEW PAGE -->
+
+            <section id="overviewPage" class="page">
+
+                <div class="section-heading">
+                    <div>
+                        <h2>Overview</h2>
+                        <p>Your transaction security at a glance.</p>
+                    </div>
+
+                    <button class="secondary-button" onclick="loadDashboard()">
+                        ↻ Refresh
+                    </button>
+                </div>
+
+
+                <div class="stats-grid">
+
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <span>Total Transactions</span>
+                            <span class="stat-icon blue">▤</span>
+                        </div>
+
+                        <h2 id="totalTransactions">0</h2>
+                        <small>Analysed transactions</small>
+                    </div>
+
+
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <span>Approved</span>
+                            <span class="stat-icon green">✓</span>
+                        </div>
+
+                        <h2 id="approvedTransactions">0</h2>
+                        <small>Low-risk transactions</small>
+                    </div>
+
+
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <span>Under Review</span>
+                            <span class="stat-icon orange">◷</span>
+                        </div>
+
+                        <h2 id="reviewTransactions">0</h2>
+                        <small>Require attention</small>
+                    </div>
+
+
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <span>Blocked</span>
+                            <span class="stat-icon red">!</span>
+                        </div>
+
+                        <h2 id="blockedTransactions">0</h2>
+                        <small>High-risk transactions</small>
+                    </div>
+
+                </div>
+
+
+                <div class="charts-grid">
+
+                    <div class="panel">
+                        <h3>Transaction Decisions</h3>
+                        <p>Distribution of analysed transactions.</p>
+
+                        <div class="chart-container">
+                            <canvas id="decisionChart"></canvas>
+                        </div>
+                    </div>
+
+
+                    <div class="panel risk-panel">
+
+                        <h3>Risk Overview</h3>
+                        <p>Average model risk score.</p>
+
+                        <div class="risk-circle" id="riskCircle">
+                            <div>
+                                <strong id="averageRisk">0.0</strong>
+                                <span>/ 100</span>
+                            </div>
+                        </div>
+
+                        <p class="risk-caption">
+                            Average transaction risk score
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="panel recent-panel">
+
+                    <div class="section-heading">
+                        <div>
+                            <h3>Recent Transactions</h3>
+                            <p>Latest transactions analysed by PayGuard AI.</p>
+                        </div>
+
+                        <button class="secondary-button"
+                                onclick="showPage('history')">
+                            View All
+                        </button>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>TYPE</th>
+                                    <th>AMOUNT</th>
+                                    <th>RISK SCORE</th>
+                                    <th>DECISION</th>
+                                    <th>DATE</th>
+                                    <th>EXPLAIN</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="recentTransactions">
+                                <tr>
+                                    <td colspan="7">Loading transactions...</td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ANALYZE PAGE -->
+
+            <section id="analyzePage" class="page hidden">
+
+                <div class="section-heading">
+                    <div>
+                        <h2>Analyze Transaction</h2>
+                        <p>Submit transaction details for AI-powered fraud analysis.</p>
+                    </div>
+                </div>
+
+
+                <div class="panel">
+
+                    <form id="transactionForm">
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+                                <label>Transaction Step</label>
+
+                                <input
+                                    type="number"
+                                    id="step"
+                                    value="100"
+                                    min="0"
+                                    required
+                                >
+                            </div>
+
+
+                            <div class="form-group">
+                                <label>Transaction Type</label>
+
+                                <select id="type" required>
+                                    <option value="PAYMENT">PAYMENT</option>
+                                    <option value="TRANSFER">TRANSFER</option>
+                                    <option value="CASH_OUT">CASH_OUT</option>
+                                    <option value="CASH_IN">CASH_IN</option>
+                                    <option value="DEBIT">DEBIT</option>
+                                </select>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label>Transaction Amount (₹)</label>
+
+                                <input
+                                    type="number"
+                                    id="amount"
+                                    value="500000"
+                                    min="0"
+                                    step="any"
+                                    required
+                                >
+                            </div>
+
+
+                            <div class="form-group">
+                                <label>Origin Account Balance (₹)</label>
+
+                                <input
+                                    type="number"
+                                    id="oldbalanceOrg"
+                                    value="500000"
+                                    min="0"
+                                    step="any"
+                                    required
+                                >
+                            </div>
+
+
+                            <div class="form-group full-width">
+                                <label>Destination Account Balance (₹)</label>
+
+                                <input
+                                    type="number"
+                                    id="oldbalanceDest"
+                                    value="0"
+                                    min="0"
+                                    step="any"
+                                    required
+                                >
+                            </div>
+
+                        </div>
+
+
+                        <button class="primary-button" type="submit" id="analyzeButton">
+                            Analyze Transaction →
+                        </button>
+
+                    </form>
+
+
+                    <div id="analysisResult" class="analysis-result hidden">
+
+                        <div class="result-heading">
+                            <div>
+                                <p class="eyebrow">AI ANALYSIS RESULT</p>
+                                <h3>Transaction Assessment</h3>
+                            </div>
+
+                            <span id="resultDecision" class="decision-badge">
+                                BLOCK
+                            </span>
+                        </div>
+
+
+                        <div class="result-grid">
+
+                            <div>
+                                <small>Risk Score</small>
+                                <h2 id="resultRisk">0/100</h2>
+                            </div>
+
+                            <div>
+                                <small>Fraud Model Output</small>
+                                <h2 id="resultProbability">0%</h2>
+                            </div>
+
+                            <div>
+                                <small>Transaction ID</small>
+                                <h2 id="resultId">—</h2>
+                            </div>
+
+                        </div>
+
+                        <p id="resultMessage"></p>
+
+                        <button class="secondary-button"
+                                id="explainResultButton">
+                            Explain This Transaction
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="panel recent-panel">
+
+                    <div class="section-heading">
+                        <div>
+                            <h3>Recent Transactions</h3>
+                            <p>Latest transactions analysed by PayGuard AI.</p>
+                        </div>
+
+                        <button class="secondary-button"
+                                onclick="showPage('history')">
+                            View Latest
+                        </button>
+                    </div>
+
+                    <div class="table-wrapper">
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>TYPE</th>
+                                    <th>AMOUNT</th>
+                                    <th>RISK SCORE</th>
+                                    <th>DECISION</th>
+                                    <th>DATE</th>
+                                    <th>EXPLAIN</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="analyzeRecentTransactions">
+                                <tr>
+                                    <td colspan="7">Loading transactions...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- HISTORY PAGE -->
+
+            <section id="historyPage" class="page hidden">
+
+                <div class="section-heading">
+                    <div>
+                        <h2>Transaction History</h2>
+                        <p>Review previously analysed transactions.</p>
+                    </div>
+
+                    <button class="secondary-button" onclick="loadDashboard()">
+                        ↻ Refresh
+                    </button>
+                </div>
+
+
+                <div class="panel">
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>STEP</th>
+                                    <th>TYPE</th>
+                                    <th>AMOUNT</th>
+                                    <th>RISK SCORE</th>
+                                    <th>DECISION</th>
+                                    <th>DATE</th>
+                                    <th>EXPLAIN</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="historyTransactions">
+                                <tr>
+                                    <td colspan="8">Loading transactions...</td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- SHAP EXPLANATION PANEL -->
+
+            <section id="explanationPanel" class="panel explanation-panel hidden">
+
+                <div class="explanation-heading">
+
+                    <div>
+                        <p class="eyebrow">SHAP · EXPLAINABLE AI</p>
+
+                        <h3>Why was this transaction classified?</h3>
+
+                        <p id="explanationSubtitle">
+                            Transaction explanation
+                        </p>
+                    </div>
+
+                    <button class="secondary-button"
+                            onclick="closeExplanation()">
+                        Close
+                    </button>
+
+                </div>
+
+
+                <div class="explanation-summary">
+
+                    <div>
+                        <small>Transaction ID</small>
+                        <h2 id="explainTransactionId">—</h2>
+                    </div>
+
+                    <div>
+                        <small>Decision</small>
+                        <h2 id="explainDecision">—</h2>
+                    </div>
+
+                    <div>
+                        <small>Risk Score</small>
+                        <h2 id="explainRisk">—</h2>
+                    </div>
+
+                </div>
+
+
+                <h4 class="contribution-title">
+                    Feature Contributions
+                </h4>
+
+                <p class="contribution-description">
+                    Positive SHAP values increase the model's fraud prediction.
+                    Negative values decrease it.
+                </p>
+
+                <div id="shapFeatures">
+                    Select Explain to view feature contributions.
+                </div>
+
+            </section>
+
+
+            <footer class="footer">
+                PayGuard AI · AI-powered payment fraud detection
+            </footer>
+
+        </main>
+
+    </div>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
