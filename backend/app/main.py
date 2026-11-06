@@ -27,6 +27,7 @@ from sqlalchemy import (
     func
 )
 
+from sqlalchemy.engine import URL
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
 
 
@@ -39,10 +40,48 @@ BACKEND_DIR = BASE_DIR.parent
 
 load_dotenv(BACKEND_DIR / ".env")
 
+# Use DATABASE_URL if provided.
+# Otherwise, construct the connection using Render DB_* variables.
+
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-if not DATABASE_URL:
-    raise RuntimeError("DATABASE_URL missing in backend/.env")
+if DATABASE_URL:
+    db_url = DATABASE_URL
+else:
+    required_vars = [
+        "DB_USER",
+        "DB_PASSWORD",
+        "DB_HOST",
+        "DB_NAME"
+    ]
+
+    missing_vars = [
+        key for key in required_vars
+        if not os.getenv(key)
+    ]
+
+    if missing_vars:
+        raise RuntimeError(
+            f"Missing database environment variables: {', '.join(missing_vars)}"
+        )
+
+    db_url = URL.create(
+        drivername="mysql+pymysql",
+        username=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        host=os.getenv("DB_HOST"),
+        port=int(os.getenv("DB_PORT", "4000")),
+        database=os.getenv("DB_NAME", "payguard_db")
+    )
+
+# TiDB Cloud requires an SSL connection.
+connect_args = {}
+
+if os.getenv("DB_SSL", "true").lower() == "true":
+    connect_args = {
+        "ssl_verify_cert": True,
+        "ssl_verify_identity": True
+    }
 
 
 # ==========================================================
@@ -82,8 +121,9 @@ explainer = shap.TreeExplainer(model)
 # ==========================================================
 
 engine = create_engine(
-    DATABASE_URL,
-    pool_pre_ping=True
+    db_url,
+    pool_pre_ping=True,
+    connect_args=connect_args
 )
 
 SessionLocal = sessionmaker(
@@ -299,11 +339,9 @@ def prepare_features(transaction: Transaction):
 def calculate_decision(risk_score):
 
     if risk_score >= BLOCK_LIMIT:
-
         return "BLOCK"
 
     elif risk_score >= APPROVE_LIMIT:
-
         return "REVIEW"
 
     return "APPROVE"
@@ -523,7 +561,6 @@ def dashboard_stats(
     }
 
     for decision, count in results:
-
         counts[decision] = count
 
     average_risk = (
@@ -618,9 +655,6 @@ def explain_transaction(
             values = np.asarray(shap_values)
 
             if values.ndim == 3:
-
-                # Binary classification:
-                # Select positive class (fraud)
 
                 contributions = values[0, :, 1]
 
